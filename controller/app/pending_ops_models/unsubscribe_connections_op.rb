@@ -21,7 +21,7 @@ class UnsubscribeConnectionsOp < PendingAppOp
         tag = sub_inst._id.to_s
 
         sub_inst.gears.each do |gear|
-          unless gear.removed
+          unless gear.removed or gear.server_identity.nil?
             job = gear.get_unsubscribe_job(sub_inst, pub_cart_name)
             RemoteJob.add_parallel_job(handle, tag, gear, job)
           end
