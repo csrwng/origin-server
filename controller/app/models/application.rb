@@ -1949,14 +1949,13 @@ class Application
       deleting_app = true if self.gears.find(gear_id).app_dns
       destroy_gear_op = DestroyGearOp.new(gear_id: gear_id)
       deregister_dns_op = DeregisterDnsOp.new(gear_id: gear_id, prereq: [destroy_gear_op._id.to_s])
-      unreserve_uid_op = UnreserveGearUidOp.new(gear_id: gear_id, prereq: [deregister_dns_op._id.to_s])
-      delete_gear_op = DeleteGearOp.new(gear_id: gear_id, prereq: [unreserve_uid_op._id.to_s])
+      delete_gear_op = DeleteGearOp.new(gear_id: gear_id, prereq: [deregister_dns_op._id.to_s])
       track_usage_op = TrackUsageOp.new(user_id: self.domain.owner._id, parent_user_id: self.domain.owner.parent_user_id,
                           app_name: self.name, gear_id: gear_id, event: UsageRecord::EVENTS[:end],
                           usage_type: UsageRecord::USAGE_TYPES[:gear_usage],
                           prereq: [delete_gear_op._id.to_s])
 
-      pending_ops.push(destroy_gear_op, deregister_dns_op, unreserve_uid_op, delete_gear_op, track_usage_op)
+      pending_ops.push(destroy_gear_op, deregister_dns_op, delete_gear_op, track_usage_op)
 
       if additional_filesystem_gb != 0
         pending_ops <<  TrackUsageOp.new(user_id: self.domain.owner._id, parent_user_id: self.domain.owner.parent_user_id,

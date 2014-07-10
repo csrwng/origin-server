@@ -6,6 +6,7 @@ class DeleteGearOp < PendingAppOp
     group_instance = nil
     begin
       gear = get_gear()
+      gear.unreserve_uid
       group_instance = gear.group_instance
       gear.delete
       pending_app_op_group.inc(:num_gears_destroyed, 1)
@@ -39,7 +40,7 @@ class DeleteGearOp < PendingAppOp
       # ignore if the group instance is already deleted
     end
 
-    # add an op_group to remove the ssh key created/added for this gear 
+    # add an op_group to remove the ssh key created/added for this gear
     remove_ssh_keys = application.app_ssh_keys.find_by(component_id: gear_id) rescue []
     remove_ssh_keys = [remove_ssh_keys].flatten
     if remove_ssh_keys.length > 0
